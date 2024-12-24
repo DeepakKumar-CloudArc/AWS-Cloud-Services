@@ -3,6 +3,7 @@ Used case:
 #First we will create another bucket named as "new-bucket"
 #Using bash script copy "BUCKET-A/folder-A" objects from particular date in the "new-bucket"
 #Run aws sync command to sync from "new-bucket/folder-A to "BUCKET-A/folder-B"
+#Run aws rm command to delete "new-bucket/folder-A"
 
 #Install AWS CLI on any Linux machine. You can also use EC2 linux instance
 
