@@ -1,0 +1,46 @@
+Used case:
+#We want copy one folder-A objects to another folder-B in the same bucket "BUCKET-A".
+#First we will create another bucket named as "new-bucket"
+#Using bash script copy "BUCKET-A/folder-A" objects from particular date in the "new-bucket"
+#Run aws sync command to sync from "new-bucket/folder-A to "BUCKET-A/folder-B"
+
+#Install AWS CLI on any Linux machine. You can also use EC2 linux instance
+
+#configure AWS keys in the linux machine
+$ aws configure
+aws access key: ..........................(Your Access Key)
+aws secrete key: ............................(Your Secrete Key)
+#Press Enter to save changes
+
+#Navigate to particular path like /opt.
+#create a folder like scripts
+#Create bash script file copys3sourcetos3target.sh using below command
+
+$ sudo nano copys3sourcetos3target.sh
+#Copy below scripts in it
+______________________________________________________________________________________________
+#!/bin/bash
+SOURCE_BUCKET="BUCKET-A"
+DESTINATION_BUCKET="new-bucket" #new bucket for temporary copying the source folder from particular date#
+PREFIX="folder-A" 
+#you can mention here the sub-folder name of source bucket which you want to clone#
+
+content=$(aws s3api list-objects --bucket $SOURCE_BUCKET --query 'Contents[?(LastModified > `2024-05-09`)]' --prefix $PREFIX | jq-r ".[].Key")
+for file in $content;
+do
+    aws s3api copy-object --copy-source $SOURCE_BUCKET/$file --key $file --bucket $DESTINATION_BUCKET | jq
+done
+aws s3 sync s3://new-bucket/folder-A s3://BUCKET-A/folder-B
+aws s3 rm s3://new-bucket/folder-A --recursive #delete temporary folder 
+__________________________________________________________________________________________________________________
+
+#save the file and give executable permission using below command
+$ sudo chmod +x /opt/script/copys3sourcetos3target.sh
+
+#Update the required object's date in the scripts of line no 25: 'Contents[?(LastModified > `2024-05-09`)]'
+
+#It will list the files from the date mentioned in the scripts from source bucket and start copying till the current date
+
+#To run the script navigate to the path /opt/scripts and run below command
+
+$ ./copys3sourcetos3target.sh
