@@ -1,0 +1,17 @@
+redash renewal
+---------------
+run the command
+certbot certonly -d example.com
+
+you need to choose one from the following based on your requirment
+1: Spin up a temporary webserver (standalone)
+2: Place files in webroot directory (webroot)
+
+Give the number 2 like below for the webroot certs
+
+Select the appropriate number [1-2] then [enter] (press 'c' to cancel): 2
+
+You need to provide the webroot path as provided below. i.e /var/www/html
+Input the webroot for example.com: (Enter 'c' to cancel): /var/www/html
+
+Finally the certificate is renewed and keys will be stored in /etc/letsencrypt/live/example.com
