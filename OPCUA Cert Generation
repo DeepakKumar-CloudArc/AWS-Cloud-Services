@@ -1,0 +1,24 @@
+Make sure openssl version is 1.1.1
+
+Run rake task to generate a new certificate:
+
+bundle exec rake generate_project_certificates:do -- '--project_name=PROJECT_NAME'
+
+Recommended certificate attributes:
+
+C (Country): US
+ST (State): California
+L (Locality): San Francisco
+O (Organization): Radian
+OU (Organizational Unit): Lens
+CN (Common Name): Radian
+EMAIL (Email Address): eric.baller@radiangen.com
+
+Then send a request to OPCUA server with the newly created certificate which can be done with another rake task:
+
+bundle exec rake send_query_to_opcua_server:do -- '--project_name=PROJECT_NAME'
+
+The newly created certificate has now been sent to OPCUA server. Please, ask a contact person to move the certificate from Rejected to Trusted folder on their server.
+
+Once that done, it is needed to set is_registered flag to true for the certificate on certificates table. From now on, this certificate will be used when sending requests to OPCUA server.
+
