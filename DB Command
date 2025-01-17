@@ -1,0 +1,205 @@
+#Grant access to User
+GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, RELOAD, PROCESS, REFERENCES, INDEX, ALTER, SHOW DATABASES, CREATE TEMPORARY TABLES, LOCK TABLES, EXECUTE, REPLICATION SLAVE, REPLICATION CLIENT, CREATE VIEW, SHOW VIEW, CREATE ROUTINE, ALTER ROUTINE, CREATE USER, EVENT, TRIGGER ON *.* TO 'radianprod'@'%' WITH GRANT OPTION
+
+UserID-radianrepl 
+Password-Radian$@123'
+
+QA
+GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, RELOAD, PROCESS, REFERENCES, INDEX, ALTER, SHOW DATABASES, CREATE TEMPORARY TABLES, LOCK TABLES, 
+EXECUTE, REPLICATION SLAVE, REPLICATION CLIENT, CREATE VIEW, SHOW VIEW, CREATE ROUTINE, ALTER ROUTINE, CREATE USER, EVENT, TRIGGER ON *.* TO 'radianprod'@'%' WITH GRANT OPTION |
+
+SELECT User FROM mysql.user;
+CREATE USER 'chadmin'@'%' IDENTIFIED BY 'ch&%$#@22';
+show grants for 'yogi';
+
+yogi	yogi@#$123
+chadmin	ch&%$#@22
+###################Access redshift
+HOST NAME: redshift-dontdelete-cluster-1.cmeufsh0awsv.us-west-2.redshift.amazonaws.com
+DB NAME: dev
+PASSWORD: Aug$1808
+PORT: 5439
+USER NAME: admin
+
+
+##Create DB schema dump
+mysqldump -h qa-feb.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p --no-data ebdb >schema.sql
+
+
+GRANT SELECT, REPLICATION CLIENT, SHOW DATABASES, SUPER, PROCESS ON *.* TO 'radianprod'@'qa-april.cj7wrlouncmk.us-west-2.rds.amazonaws.com' IDENTIFIED BY 'L3nSqApr123';
+
+pt-table-sync --print --bidirectional --conflict-column *\
+--conflict-comparison newest --databases ebdb\
+h=qa-april.cj7wrlouncmk.us-west-2.rds.amazonaws.com,u=radianprod,p=L3nSqApr123\
+#######################################################################################
+#################### MySQL Dump Process ############################
+mysqldump -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p ebdb measures_measurements --where="id<100"| gzip >measuresmeasurements.sql.gz
+
+#Restore Dump
+gunzip </home/ubuntu/measuresmeasurements.sql.gz | mysql -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p ebdb measures_measurements_new1
+
+mysqldump -h$HOST -P$PORT -u$USER -p$PASS $DB -e $TABLE > $TABLE-$HRBKP.txt
+        tar -czPf $TABLE-$HRBKP.txt.gz $TABLE-$HRBKP.txt
+        /usr/local/bin/aws s3 cp $SRCDIR/$TABLE-$HRBKP.txt.gz s3://$BUCKET/$DESTDIR/
+
+
+mysqldump -h$HOST -P$PORT -u$USER -p$PASS --quote-names --create-options --force $DB $TABLE > $TABLE-$HRBKP.sql
+        tar -czPf $TABLE-$HRBKP.tar.gz $TABLE-$HRBKP.sql
+        /usr/local/bin/aws s3 cp $SRCDIR/$TABLE-$HRBKP.tar.gz s3://$BUCKET/$DESTDIR/
+
+
+mysqldump -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p -t  -T/home/ubuntu/Downloads ebdb measures_measurements --where= "id<=10000"--fields-terminated-by=',' 
+###Read large txt file###
+SELECT * INTO OUTFILE '/home/ubuntu/Downloads/measurements.txt'
+FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+FROM ebdb.measures_measurements;
+##
+mysqldump -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p -t  -T/home/ubuntu/Downloads/ ebdb measures_measurements --fields-terminated-by=','
+##
+mysqldump -B -u radianprod -p L3ns654321 ebdb -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -e "SELECT * FROM measures_measurements;" \ | sed "s/\"/\"\"/g;s/'/\'/;s/\t/\",\"/g;s/^/\"/;s/$/\"/;s/\n//g" >/home/ubuntu/Downloads/measurements.csv.gz
+##
+mysqldump -B -u radianprod -p ebdb measures_measurements -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -e "SELECT * FROM measures_measurements where id<=10000000 ;" \ | sed "s/\"/\"\"/g;s/'/\'/;s/\t/\",\"/g;s/^/\"/;s/$/\"/;s/\n//g" >/home/ubuntu/Desktop/measurements.csv.gz
+##
+mysql -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p --local-infile ebdb -e "LOAD DATA LOCAL INFILE '/home/ubuntu/Desktop/measures_measurements-07052024-07h10m.csv'  INTO TABLE measures_measurements_new1  FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n'"
+
+####################################################
+
+Batch wise mysqldump:
+	started Time:  09-05-2024 02:45AM IST
+	Finished Time: 10-05-2024 00:02AM IST
+Range :1000000000
+Number of files :35
+
+Restore From Zip file 
+	Start Time: 10-05-2024 00:36AM IST
+
+Unzip a file:
+	Start Time: 10-05-2024 9:58AM IST
+	Finished Time:10-05-2024 10:06 AM
+
+Restore from .sql
+	Start Time: 10-05-2024 10:13
+	Finished Time:10-05-2024 14:27
+File 1-	90.6GiB 4:13:27 [6.10MiB/s] [=====================================================================================>] 100% 
+File 2-	74.3GiB 3:28:07 [6.09MiB/s] [=====================================================================================>] 100% 
+
+
+
+
+
+Command for dump:
+mysqldump -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p$PASS ebdb measures_measurements_new1 --no-create-info --skip-lock-tables --set-gtid-purged=off --where="id>0 and id<=1000000000" --quick | gzip| pv >/home/ubuntu/mm/test/measuresmeasurements1.sql.gz
+
+...........................................................................................................................
+
+Command to restore:
+
+pv |gunzip <measuresmeasurements1.sql.gz | mysql -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p ebdb
+
+pv <measuresmeasurements31.sql | mysql -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p ebdb
+
+mysqldump -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p ebdb measures_measurements --where="id<5000" --quick | gzip >measuresmeasurements.sql.gz
+
+
+mysqldump  -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p --fields-optionally-enclosed-by='"' --fields-terminated-by=',' --tab /tmp/s3backups/ ebdb --table measures_measurements --where="id<5000"
+
+Removed
+Line 18, 46 
+
+Dump 1000000000
+Start 15:32
+
+____________________________________________________________________
+
+1	mysqldump -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p ebdb measures_measurements_new1 --no-create-info --skip-lock-tables --set-gtid-purged=off --where="id<=1000000000" --quick | gzip| pv >measuresmeasurements1.sql.gz
+
+2	mysqldump -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p ebdb measures_measurements_new1 --no-create-info --skip-lock-tables --set-gtid-purged=off --set-gtid-purged=off --where="id>1000000000 and id<=2000000000" --quick | gzip | pv >measuresmeasurements2.sql.gz
+
+3	mysqldump -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p ebdb measures_measurements_new1 --no-create-info --skip-lock-tables --set-gtid-purged=off --single-transaction --where="id>2000000000 and id<=3000000000" --quick | gzip >measuresmeasurements3.sql.gz
+
+Test to remove 18Line during the dump command (--set-gtid-purged=off)
+
+mysqldump -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p ebdb measures_measurements_new1 --no-create-info --skip-lock-tables --set-gtid-purged=off --where="id<100" --quick | gzip >measuresmeasurements2.sql.gz
+
+mysqldump -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p$PASS ebdb measures_measurements_new1 --no-create-info --skip-lock-tables --set-gtid-purged=off --where="id>0 and id<=1000000000" --quick | gzip| pv >/home/ubuntu/mm/test/measuresmeasurements1.sql.gz
+
+mysqldump -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p$PASS ebdb measures_measurements_new1 --no-create-info --skip-lock-tables --set-gtid-purged=off --where="id>1000000000 and id <=2000000000" --quick | gzip| pv >/home/ubuntu/mm/test/measuresmeasurements2.sql.gz
+
+mysqldump -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p$PASS ebdb measures_measurements_new1 --no-create-info --skip-lock-tables --set-gtid-purged=off --where="id>2000000000 and id <=3000000000" --quick | gzip| pv >/home/ubuntu/mm/test/measuresmeasurements3.sql.gz
+
+mysqldump -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p$PASS ebdb measures_measurements_new1 --no-create-info --skip-lock-tables --set-gtid-purged=off --where="id>3000000000 and id <=4000000000" --quick | gzip| pv >/home/ubuntu/mm/test/measuresmeasurements4.sql.gz
+
+mysqldump -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p$PASS ebdb measures_measurements_new1 --no-create-info --skip-lock-tables --set-gtid-purged=off --where="id>4000000000 and id <=5000000000" --quick | gzip| pv >/home/ubuntu/mm/test/measuresmeasurements5.sql.gz
+
+mysqldump -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p$PASS ebdb measures_measurements_new1 --no-create-info --skip-lock-tables --set-gtid-purged=off --where="id>5000000000 and id <=6000000000" --quick | gzip| pv >/home/ubuntu/mm/test/measuresmeasurements6.sql.gz
+
+mysqldump -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p$PASS ebdb measures_measurements_new1 --no-create-info --skip-lock-tables --set-gtid-purged=off --where="id>6000000000 and id <=7000000000" --quick | gzip| pv >/home/ubuntu/mm/test/measuresmeasurements7.sql.gz
+
+mysqldump -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p$PASS ebdb measures_measurements_new1 --no-create-info --skip-lock-tables --set-gtid-purged=off --where="id>7000000000 and id <=8000000000" --quick | gzip| pv >/home/ubuntu/mm/test/measuresmeasurements8.sql.gz
+
+mysqldump -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p$PASS ebdb measures_measurements_new1 --no-create-info --skip-lock-tables --set-gtid-purged=off --where="id>8000000000 and id <=9000000000" --quick | gzip| pv >/home/ubuntu/mm/test/measuresmeasurements9.sql.gz
+
+mysqldump -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p$PASS ebdb measures_measurements_new1 --no-create-info --skip-lock-tables --set-gtid-purged=off --where="id>9000000000 and id <=10000000000" --quick | gzip| pv >/home/ubuntu/mm/test/measuresmeasurements10.sql.gz
+
+mysqldump -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p$PASS ebdb measures_measurements_new1 --no-create-info --skip-lock-tables --set-gtid-purged=off --where="id>10000000000 and id <=11000000000" --quick | gzip| pv >/home/ubuntu/mm/test/measuresmeasurements11.sql.gz
+
+mysqldump -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p$PASS ebdb measures_measurements_new1 --no-create-info --skip-lock-tables --set-gtid-purged=off --where="id>11000000000 and id <=12000000000" --quick | gzip| pv >/home/ubuntu/mm/test/measuresmeasurements12.sql.gz
+
+mysqldump -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p$PASS ebdb measures_measurements_new1 --no-create-info --skip-lock-tables --set-gtid-purged=off --where="id>11000000000 and id <=13000000000" --quick | gzip| pv >/home/ubuntu/mm/test/measuresmeasurements13.sql.gz
+
+mysqldump -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p$PASS ebdb measures_measurements_new1 --no-create-info --skip-lock-tables --set-gtid-purged=off --where="id>13000000000 and id <=14000000000" --quick | gzip| pv >/home/ubuntu/mm/test/measuresmeasurements14.sql.gz
+
+mysqldump -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p$PASS ebdb measures_measurements_new1 --no-create-info --skip-lock-tables --set-gtid-purged=off --where="id>14000000000 and id <=15000000000" --quick | gzip| pv >/home/ubuntu/mm/test/measuresmeasurements15.sql.gz
+
+mysqldump -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p$PASS ebdb measures_measurements_new1 --no-create-info --skip-lock-tables --set-gtid-purged=off --where="id>15000000000 and id <=16000000000" --quick | gzip| pv >/home/ubuntu/mm/test/measuresmeasurements16.sql.gz
+
+mysqldump -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p$PASS ebdb measures_measurements_new1 --no-create-info --skip-lock-tables --set-gtid-purged=off --where="id>16000000000 and id <=17000000000" --quick | gzip| pv >/home/ubuntu/mm/test/measuresmeasurements17.sql.gz
+
+mysqldump -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p$PASS ebdb measures_measurements_new1 --no-create-info --skip-lock-tables --set-gtid-purged=off --where="id>17000000000 and id <=18000000000" --quick | gzip| pv >/home/ubuntu/mm/test/measuresmeasurements18.sql.gz
+
+mysqldump -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p$PASS ebdb measures_measurements_new1 --no-create-info --skip-lock-tables --set-gtid-purged=off --where="id>18000000000 and id <=19000000000" --quick | gzip| pv >/home/ubuntu/mm/test/measuresmeasurements19.sql.gz
+
+mysqldump -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p$PASS ebdb measures_measurements_new1 --no-create-info --skip-lock-tables --set-gtid-purged=off --where="id>19000000000 and id <=20000000000" --quick | gzip| pv >/home/ubuntu/mm/test/measuresmeasurements20.sql.gz
+
+mysqldump -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p$PASS ebdb measures_measurements_new1 --no-create-info --skip-lock-tables --set-gtid-purged=off --where="id>20000000000 and id <=21000000000" --quick | gzip| pv >/home/ubuntu/mm/test/measuresmeasurements21.sql.gz
+
+mysqldump -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p$PASS ebdb measures_measurements_new1 --no-create-info --skip-lock-tables --set-gtid-purged=off --where="id>21000000000 and id <=22000000000" --quick | gzip| pv >/home/ubuntu/mm/test/measuresmeasurements22.sql.gz
+
+mysqldump -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p$PASS ebdb measures_measurements_new1 --no-create-info --skip-lock-tables --set-gtid-purged=off --where="id>22000000000 and id <=23000000000" --quick | gzip| pv >/home/ubuntu/mm/test/measuresmeasurements23.sql.gz
+
+mysqldump -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p$PASS ebdb measures_measurements_new1 --no-create-info --skip-lock-tables --set-gtid-purged=off --where="id>23000000000 and id <=24000000000" --quick | gzip| pv >/home/ubuntu/mm/test/measuresmeasurements24.sql.gz
+
+mysqldump -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p$PASS ebdb measures_measurements_new1 --no-create-info --skip-lock-tables --set-gtid-purged=off --where="id>24000000000 and id <=25000000000" --quick | gzip| pv >/home/ubuntu/mm/test/measuresmeasurements25.sql.gz
+
+mysqldump -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p$PASS ebdb measures_measurements_new1 --no-create-info --skip-lock-tables --set-gtid-purged=off --where="id>25000000000 and id <=26000000000" --quick | gzip| pv >/home/ubuntu/mm/test/measuresmeasurements26.sql.gz
+
+mysqldump -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p$PASS ebdb measures_measurements_new1 --no-create-info --skip-lock-tables --set-gtid-purged=off --where="id>26000000000 and id <=27000000000" --quick | gzip| pv >/home/ubuntu/mm/test/measuresmeasurements27.sql.gz
+
+mysqldump -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p$PASS ebdb measures_measurements_new1 --no-create-info --skip-lock-tables --set-gtid-purged=off --where="id>27000000000 and id <=28000000000" --quick | gzip| pv >/home/ubuntu/mm/test/measuresmeasurements28.sql.gz
+
+mysqldump -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p$PASS ebdb measures_measurements_new1 --no-create-info --skip-lock-tables --set-gtid-purged=off --where="id>28000000000 and id <=29000000000" --quick | gzip| pv >/home/ubuntu/mm/test/measuresmeasurements29.sql.gz
+
+mysqldump -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p$PASS ebdb measures_measurements_new1 --no-create-info --skip-lock-tables --set-gtid-purged=off --where="id>29000000000 and id <=30000000000" --quick | gzip| pv >/home/ubuntu/mm/test/measuresmeasurements30.sql.gz
+
+mysqldump -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p$PASS ebdb measures_measurements_new1 --no-create-info --skip-lock-tables --set-gtid-purged=off --where="id>30000000000 and id <=31000000000" --quick | gzip| pv >/home/ubuntu/mm/test/measuresmeasurements31.sql.gz
+
+mysqldump -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p$PASS ebdb measures_measurements_new1 --no-create-info --skip-lock-tables --set-gtid-purged=off --where="id>31000000000 and id <=32000000000" --quick | gzip| pv >/home/ubuntu/mm/test/measuresmeasurements32.sql.gz
+
+mysqldump -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p$PASS ebdb measures_measurements_new1 --no-create-info --skip-lock-tables --set-gtid-purged=off --where="id>32000000000 and id <=33000000000" --quick | gzip| pv >/home/ubuntu/mm/test/measuresmeasurements33.sql.gz
+
+mysqldump -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p$PASS ebdb measures_measurements_new1 --no-create-info --skip-lock-tables --set-gtid-purged=off --where="id>33000000000 and id <=34000000000" --quick | gzip| pv >/home/ubuntu/mm/test/measuresmeasurements34.sql.gz
+
+mysqldump -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p$PASS ebdb measures_measurements_new1 --no-create-info --skip-lock-tables --set-gtid-purged=off --where="id>34000000000 and id <=35000000000" --quick | gzip| pv >/home/ubuntu/mm/test/measuresmeasurements35.sql.gz
+
+________________________________________________________________________________
+
+
+#Restore
+1. pv </home/ubuntu/mm/measuresmeasurements1.sql | mysql -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p ebdb
+
+2. FROM S3 TO TABLE
+ pv | gunzip <aws s3 cp s3://my-dbtable-backups/measuresmeasurements1.sql.gz -mysql -h qa-april-new.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -pL3ns654321 ebdb
+
+Command to restore dump skipping duplicate
+sed -e "s/^INSERT INTO/INSERT IGNORE INTO/" </home/ubuntu/ebdb.sql | mysql -h environment-db.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u radianprod -p ebdb
