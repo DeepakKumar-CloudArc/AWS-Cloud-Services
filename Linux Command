@@ -172,3 +172,32 @@ __________________________________________________________________________
 wget https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm
 sudo yum install ./google-chrome-stable_current_x86_64.rpm
 sudo ln -s /usr/bin/google-chrome-stable /usr/bin/chromium
+
+
+
+##Sidekiq command
+queue_name = "data"
+ 
+Sidekiq::Queue.new(queue_name).each do |job|
+  if job.args.include?("133120")
+    job.delete
+  end
+end
+
+
+project_ids_to_delete = [16880,16784]
+ 
+Sidekiq::Queue.new("import").each do |job|
+  if project_ids_to_delete.include?(job.args[0]) 
+    job.delete
+  end
+end
+
+
+queue_name = "import"
+ 
+Sidekiq::Queue.new(queue_name).each do |job|
+  if job.args.include?("16601")
+    puts "Found job: #{import} with args #{1}"
+  end
+end
