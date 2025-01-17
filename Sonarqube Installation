@@ -1,0 +1,66 @@
+Sonarqube Installation 
+
+Launch a instance with ubuntu 22.04
+Login to instance and run $update sudo apt update
+Switch to root user $sudo su -
+Install Mysql $apt install mysql-client-core-8.0
+Install Java $apt install openjdk-19-jre-headless
+
+
+Copy Sonarqube download link and paste
+$wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-10.0.0.68432.zip?_gl=1*1i97xmc*_ga*ODM0MTYzMjcxLjE2NTg5MDA2OTk.*_ga_9JZ0GZ5TC6*MTY4MDY5ODQ5MS42LjEuMTY4MDcwMDAyMC42MC4wLjA.
+
+Unzip the folder
+Rename folder $sudo mv sonarqube-10.0.0.68432 sonarqube
+root is not advisable so create new user
+$useradd sonaradmin
+$passwd sonaradmin
+	L3ns#Son@
+Move back to cd /opt
+Change own	User:Group	and sonarqube
+$chown -R sonaradmin:sonaradmin sonarqube
+Done Sonarqube Installation
+
+Next Step Database
+Create RDS instance with minimal requirement
+in rds security group add ec2 IP access for 3306
+
+Now Go to instance again
+login as root
+connect to mysql
+Create new Sonar Database
+CREATE DATABASE sonar CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+Create Local and Remote User
+CREATE USER sonar@localhost IDENTIFIED BY 'sonar';
+CREATE USER sonar@'%' IDENTIFIED BY 'sonar';
+
+Grnat database access permission to Users
+GRANT ALL ON sonar.* TO sonar@localhost;
+GRANT ALL ON sonar.* TO sonar@'%';
+
+Check User and Database
+	use mysql
+	show databases;
+	SELECT User FROM mysql.user;
+	FLUSH PRIVILEGES;
+	Quit
+mysql -h sonarqube.cj7wrlouncmk.us-west-2.rds.amazonaws.com -u sonar -p
+UserName: sonar Passwd: S0nAr2023
+Now we need to tell sonar about our database
+
+Go to sonar folder conf dir
+$cd /opt/sonarqube/conf
+Edit sonar.properties
+$vi sonar.properties
+Uncomment and made below changes
+	sonar.jdbc.username=sonar
+	sonar.jdbc.password=S0nAr2023
+	sonar.jdbc.url=jdbc:sqlserver://sonarqube.cj7wrlouncmk.us-		west-2.rds.amazonaws.com;databaseName=sonar;integratedSecurity=true
+	sonar.web.host=0.0.0.0
+	sonar.web.context=/sonar
+	sonar.web.port=9000
+switch to sonaradmin user
+$su - sonaradmin
+Now got sonarqube/bin/linux-x86-64 folder to run sonarqube services
+$./sonar.sh start
+$./sonar.sh status
