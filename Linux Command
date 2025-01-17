@@ -1,0 +1,174 @@
+Zip Command
+zip -r zipfile.zip directory
+
+SOURCE COPY COMMAND
+____________________
+
+scp -i /home/deepak/Downloads/RadianCOR2019.pem ec2-user@ec2-54-202-182-14.us-west-2.compute.amazonaws.com:/var/app/containerfiles/logs/qa.log /home/deepak/Downloads
+
+sudo scp -i RadianCOR2019.pem measurement_map.csv ec2-user@ec2-34-217-1-10.us-west-2.compute.amazonaws.com:/var/app/current/public
+
+sudo scp -i RadianCOR2019.pem certificate.der ec2-user@ec2-52-25-85-142.us-west-2.compute.amazonaws.com:/var/app/current/for_certs
+
+
+SERVER LOG:
+	tail -f log/production.log
+
+OPCUA
+______________
+DataImport::NodeValuesService.new(1, Time.zone.now).call
+
+DataImport::NodeValuesService.new(1, 2023_05_13_08_40_PM.csv).call
+
+openssl x509 -in /tmp/milford20230323-4357-ysflwf.pem -text -noout
+ss -anput
+sudo ip route
+sudo iptables -L
+
+
+SIDEKIQ INVESTIGATION:
+__________________________
+
+	path for sidekiq.yml
+	/var/app/current/config
+Exec start direcctive sidekiq
+	bundle exec sidekiq -e production
+
+
+aws s3 sync s3://lens-inbound-measure-data/luciana s3://lens-inbound-measure-data/sftp_MS_luciana
+
+aws s3 sync s3://lens-opcua/mustang-2 s3://lens-inbound-measure-data/sftp_Mustang
+
+
+CONFIGURE GUI FOR RDP OF LINUX VM:
+___________________________________
+
+sudo apt-get update
+sudo apt install xrdp
+sudo systemctl enable xrdp
+sudo add-apt-repository ppa:gnome3-team/gnome3
+sudo apt-get install gnome-shell ubuntu-gnome-desktop
+sudo passwd ubuntu
+
+If you encounter slow process in rdp then apply below changes-
+-Open $etc/xrdp/xrdp.ini file and change crypt_level=High as crypt_level=None
+-$gsetting set org.gnome.desktop.interface enable-animations false
+-sudo sed -i 's/max_bpp=32/max_bpp=16/g' /etc/xrdp/xrdp.ini && sudo reboot
+To revert at anytime 
+-sudo sed -i 's/max_bpp=16/max_bpp=32/g' /etc/xrdp/xrdp.ini && sudo reboot
+
+
+PASSWORD AUTHENTICATION FOR EC2
+________________________________
+
+login SSH to ec2
+Update the&nbsp;sshd_config&nbsp;file
+Log on to the&nbsp;Amazon EC2&nbsp;image by using SSH and complete the following steps:
+
+Edit the&nbsp;/etc/ssh/sshd_config&nbsp;file.
+Update the following lines:
+	PasswordAuthentication yes
+	PermitRootLogin yes
+Save the file.
+Run the following command:
+$sudo service sshd restart
+
+$sudo paaswd user 
+Enter the password
+
+
+FTP MOUNTING
+_______________
+
+sudo s3fs lens-inbound-measure-data:/sf_central_40_new /home/sf_central_40_new/mnt_s3_bucket -o allow_other -o multireq_max=10
+
+
+TO FIND THE ID FROM DB
+_______________________
+Measures::Measurement.where("created_at > ?", Date.today - 365.days).first.id
+
+Calc::ModelParameter.where("created_at > ?", Date.today - 365.days).first.id
+
+Calc::ModelParameter.where("created_at > ?", Date.today - 730.days).size
+
+
+TO SEE THE BUCKET OWNER
+___________________________
+
+aws iam list-users
+
+create bucket from cli-- aws s3 mb s3://abc
+
+
+Node upgrade
+_______________________________________________________
+sudo apt-get remove nodejs
+sudo apt-get autoremove
+
+sudo rm -rf /usr/local/bin/npm 
+sudo rm -rf /usr/local/share/man/man1/node* 
+sudo rm -rf /usr/local/lib/dtrace/node.d 
+sudo rm -rf ~/.npm 
+sudo rm -rf ~/.node-gyp 
+sudo rm -rf /opt/local/bin/node 
+sudo rm -rf opt/local/include/node 
+sudo rm -rf /opt/local/lib/node_modules  
+
+sudo rm -rf /usr/local/lib/node*
+sudo rm -rf /usr/local/include/node*
+sudo rm -rf /usr/local/bin/node*
+
+sudo apt-get update
+
+
+[cd ~
+curl -sL https://deb.nodesource.com/setup_18.x -o nodesource_setup.sh
+nano nodesource_setup.sh
+sudo bash nodesource_setup.sh
+sudo apt install nodejs]
+
+
+
+RAKE TASK
+_____________________________________________
+
+bundle exec rake summary:recalculation_projects['132432:133193'
+,'2024-04-01','2024-04-30']
+
+
+bundle exec rake measures:s3:create_s3_files
+
+
+Upgrade nodejs on Amazon Linux
+___________________________________
+
+sudo rm -R /var/cache/yum/x86_64/2/nodesource/
+curl -sL https://rpm.nodesource.com/setup_18.x | sudo -E bash -
+
+
+Install Jenkins
+___________________________________________________________________
+curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | sudo tee \
+ /usr/share/keyrings/jenkins-keyring.asc > /dev/null
+
+echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
+    https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+	/etc/apt/sources.list.d/jenkins.list > /dev/null
+sudo apt update -y
+sudo apt install jenkins -y
+sudo systemctl start jenkins && sudo systemctl enable jenkins
+0d5730197df54c868572e107367d8d22
+_____________________________________________________________________
+
+
+
+Clear all scheduled jobs from sidekiq
+
+Go to Web server Project Path /var/app/current
+Run console $bundle exec rails c
+Run $Sidekiq::ScheduledSet.new.clear
+
+__________________________________________________________________________
+wget https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm
+sudo yum install ./google-chrome-stable_current_x86_64.rpm
+sudo ln -s /usr/bin/google-chrome-stable /usr/bin/chromium
